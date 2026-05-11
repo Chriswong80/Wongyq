@@ -1,0 +1,507 @@
+<button id="nav-btn" onclick="toggleNavMenu()" title="Open Slide List">📋 MENU</button>
+
+<div id="nav-menu">
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; margin-bottom: 15px; padding-bottom: 10px;">
+    <h3 style="color:#333; margin:0; border:none !important; font-family: serif;">Slide Navigation</h3>
+    <button onclick="toggleNavMenu()" style="background:none; border:none; color:#999; font-size:28px; cursor:pointer; line-height:1;">&times;</button>
+  </div>
+  <ul id="slide-list"></ul>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js" 
+        onload="renderMathInElement(document.body);"></script>
+
+<style>
+  /* 2. MENU BUTTON STYLING */
+  #nav-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: sans-serif;
+    cursor: pointer;
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid #000000;
+    border-radius: 4px;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+  }
+
+  #nav-btn:hover { opacity: 1; background: #f0f0f0; }
+
+  /* 3. LIGHT SIDE MENU PANEL */
+  #nav-menu {
+    position: fixed;
+    top: 0;
+    left: -320px; 
+    width: 280px;
+    height: 100%;
+    background: #ffffff;
+    color: #333;
+    padding: 20px;
+    z-index: 2000;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    font-family: serif;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    border-right: 1px solid #ddd;
+  }
+
+  #nav-menu.open { left: 0; }
+
+  #slide-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  #slide-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+  }
+
+  #slide-list a {
+    color: #0072B2 !important;
+    text-decoration: none !important;
+    font-size: 0.9em;
+    display: block;
+    transition: padding-left 0.2s ease;
+  }
+
+  #slide-list a:hover { 
+    color: #000 !important; 
+    padding-left: 5px;
+  }
+
+  :root {
+    --r-background-color: #ffffff !important;
+    --r-main-font-size: clamp(22px, 2.2vw, 28px); 
+    --r-main-color: #000000;
+  }
+  
+  .reveal, .reveal .slides, .reveal .slides section {
+    background-color: #ffffff !important;
+    text-align: left !important;
+    font-size: var(--r-main-font-size);
+    color: var(--r-main-color);
+  }
+
+  .reveal .slides section {
+    padding: 0 !important; height: 100% !important; display: flex !important;
+    flex-direction: column !important; justify-content: center !important;
+  }
+
+  .reveal .slides {
+    width: 90% !important;
+    height: 95% !important;
+  }
+
+  .reveal a {
+    color: #0645AD !important;
+    text-decoration: underline;
+  }
+
+  .reveal a:visited {
+    color: #0B0080 !important;
+  }
+</style>
+
+<script>
+function toggleNavMenu() {
+  const menu = document.getElementById('nav-menu');
+  const list = document.getElementById('slide-list');
+  
+  if (!menu.classList.contains('open')) {
+    list.innerHTML = '';
+    const slides = document.querySelectorAll('.reveal .slides > section');
+
+    slides.forEach((slide, index) => {
+      const customEl = slide.querySelector('.slide-title');
+      const custom = customEl ? customEl.getAttribute('data-title') : null;
+
+      const header = slide.querySelector('h1, h2, h3, h4');
+
+      let title = "Slide " + (index + 1);
+
+      if (custom) title = custom;
+      else if (header) title = header.innerText.trim();
+
+      if (index === 0) title = "🏠 Home (Title)";
+
+      const li = document.createElement('li');
+      li.innerHTML = `<a href="#/${index}" onclick="toggleNavMenu()">${title}</a>`;
+      list.appendChild(li);
+    });
+    menu.classList.add('open');
+  } else {
+    menu.classList.remove('open');
+  }
+}
+</script>
+
+<canvas id="annotator"
+        style="position:fixed; top:0; left:0; width:100%; height:100%;
+               pointer-events:none; z-index: 1000;"></canvas>
+
+<script>
+  const c = document.getElementById('annotator');
+  const ctx = c.getContext('2d');
+  let draw = false;
+
+  function resize() {
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  window.addEventListener('mousedown', e => {
+    if (e.shiftKey) {
+      draw = true;
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(e.clientX, e.clientY);
+    }
+  });
+
+  window.addEventListener('mousemove', e => {
+    if (draw) {
+      ctx.lineTo(e.clientX, e.clientY);
+      ctx.stroke();
+    }
+  });
+
+  window.addEventListener('mouseup', () => draw = false);
+
+  window.addEventListener('keydown', e => {
+    if (e.key === 'c') {
+      ctx.clearRect(0, 0, c.width, c.height);
+    }
+  });
+</script>
+
+<style>
+
+/* -----------------------------------------------------------
+   1. MOBILE STACKING (your original perfect version)
+----------------------------------------------------------- */
+@media (max-width: 768px) {
+  .columns {
+    display: flex !important;
+    flex-direction: column-reverse !important; /* media above text */
+  }
+
+  .columns .column {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+}
+
+/* -----------------------------------------------------------
+   2. TEXT SCROLLING + BORDER REDUCTION
+----------------------------------------------------------- */
+@media (max-width: 768px) {
+
+  /* Scroll the TEXT column (first-child in DOM) */
+  .columns .column:first-child {
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+    padding-right: 10px;
+  }
+
+  /* Remove Reveal’s padding (NOT margin) */
+  .reveal .slides section.present {
+    padding: 0 !important;
+  }
+}
+
+/* -----------------------------------------------------------
+   3. FULLSCREEN BUTTON (mobile only)
+----------------------------------------------------------- */
+#go-fullscreen {
+  display: none; /* hidden by default */
+}
+
+@media (max-width: 768px) {
+  #go-fullscreen {
+    display: block;
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    z-index: 9999;
+    padding: 8px 10px;
+    font-size: 20px;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.4);
+    color: white;
+    border: none;
+  }
+}
+
+/* -----------------------------------------------------------
+   4. FULLSCREEN OFFSET + MEDIA FLUSH-TOP FIX
+----------------------------------------------------------- */
+@media (max-width: 768px) {
+
+  /* Lift fullscreen button upward by another 3% (total 8%) */
+  #go-fullscreen {
+    bottom: 8vh !important;
+  }
+
+  /* Disable Reveal vertical centering safely */
+  .reveal .slides section.present {
+    display: block !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+  }
+
+  /* Force media column to top */
+  .columns .column:last-child {
+    align-self: flex-start !important;
+    justify-content: flex-start !important;
+    display: block !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  /* Make media full-width and prevent cropping */
+  .columns .column:last-child img,
+  .columns .column:last-child video,
+  .columns .column:last-child iframe {
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+    display: block !important;
+  }
+}
+
+</style>
+
+<button id="go-fullscreen">⛶</button>
+
+<script>
+document.getElementById('go-fullscreen').addEventListener('click', () => {
+  const elem = document.documentElement;
+  if (elem.requestFullscreen) elem.requestFullscreen();
+});
+</script>
+
+<!-- =============================== -->
+<!-- ⭐ UNIVERSAL BROWSER-FILL OVERLAY (PLOTS + IMAGES + VIDEOS) ⭐ -->
+<!-- =============================== -->
+
+<style>
+  #media-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.55);
+    z-index: 5000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.25s ease-out;
+  }
+
+  #media-overlay.visible {
+    display: flex;
+    opacity: 1;
+  }
+
+  #media-overlay.hidden {
+    opacity: 0;
+  }
+
+  #media-overlay .overlay-frame-wrapper {
+    width: 90vw;
+    height: 90vh;
+    background: white;
+    box-shadow: 0 0 25px rgba(0,0,0,0.35);
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  #media-overlay iframe,
+  #media-overlay img,
+  #media-overlay video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border: none;
+  }
+
+  #media-overlay .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    z-index: 10;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid #333;
+    padding: 4px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  #media-overlay .close-btn:hover {
+    background: #f0f0f0;
+  }
+
+  .media-container {
+    position: relative;
+    display: block;
+    width: 100%;
+  }
+
+  .media-container > iframe,
+  .media-container > img,
+  .media-container > video {
+    display: block;
+    width: 100%;
+  }
+
+  .viewlarge-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 50;
+    background: rgba(255,255,255,0.85);
+    border: 1px solid #333;
+    padding: 4px 8px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .media-container:hover .viewlarge-btn {
+    opacity: 1;
+  }
+</style>
+
+<div id="media-overlay"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('media-overlay');
+
+  function openOverlay(element) {
+    overlay.innerHTML = '';
+
+    const frameWrapper = document.createElement('div');
+    frameWrapper.className = 'overlay-frame-wrapper';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'close-btn';
+    closeBtn.innerText = '✕ Close';
+
+    const clone = element.cloneNode(true);
+
+// Handle Reveal.js lazy-loaded videos
+if (clone.tagName === 'VIDEO') {
+  // If Reveal hasn't loaded it yet
+  if (clone.dataset.src && !clone.src) {
+    clone.src = clone.dataset.src;
+    clone.removeAttribute('data-src');
+  }
+
+  // Ensure controls + muted autoplay
+  clone.setAttribute('controls', 'controls');
+  clone.muted = true;
+
+  // Play once metadata is ready
+  clone.addEventListener('loadeddata', () => {
+    clone.play().catch(() => {});
+  });
+}
+
+// Handle Reveal.js lazy-loaded iframes (Plotly)
+if (clone.tagName === 'IFRAME') {
+  if (clone.dataset.src && !clone.src) {
+    clone.src = clone.dataset.src;
+    clone.removeAttribute('data-src');
+  }
+}
+
+
+    frameWrapper.appendChild(closeBtn);
+    frameWrapper.appendChild(clone);
+    overlay.appendChild(frameWrapper);
+
+    overlay.classList.remove('hidden');
+    overlay.style.display = 'flex';
+    requestAnimationFrame(() => {
+      overlay.classList.add('visible');
+    });
+
+    closeBtn.addEventListener('click', closeOverlay);
+  }
+
+  function closeOverlay() {
+    overlay.classList.remove('visible');
+    overlay.classList.add('hidden');
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      overlay.innerHTML = '';
+    }, 250);
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.classList.contains('visible')) {
+      closeOverlay();
+    }
+  });
+
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeOverlay();
+  });
+
+  function wrapMedia(element) {
+    if (element.parentElement.classList.contains('media-container')) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'media-container';
+
+    element.parentNode.insertBefore(wrapper, element);
+    wrapper.appendChild(element);
+
+    const btn = document.createElement('button');
+    btn.className = 'viewlarge-btn';
+    btn.innerText = '⛶ View Large';
+    wrapper.appendChild(btn);
+
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      openOverlay(element);
+    });
+  }
+
+  // Plotly iframes
+  document.querySelectorAll("iframe[data-src*='media/plots/'], iframe[src*='media/plots/']").forEach(frame => {
+    wrapMedia(frame);
+  });
+
+  // Images (including title slide)
+  document.querySelectorAll("img").forEach(img => {
+    wrapMedia(img);
+  });
+
+  // Videos (Reveal uses data-src)
+  document.querySelectorAll("video, video[data-src]").forEach(video => {
+    wrapMedia(video);
+  });
+});
+</script>
