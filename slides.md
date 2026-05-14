@@ -133,3 +133,24 @@ The work done $W$ is positive when the system expands against an external pressu
 
 # Bibliography
 <div id="refs"></div>
+
+
+---
+
+:::: {.columns}
+::: {.column width="50%"}
+### Xbar.one Control Chart
+This chart monitors individual observations for the `PartLength` of manufactured parts from `Machine 1` at `Temperature 303` and `Pressure 100`. It helps in detecting shifts in the process mean and identifying out-of-control points.
+
+**Key:**
+- **Red Solid Line:** Center Line (CL)
+- **Red Dashed Lines:** Upper Control Limit (UCL) and Lower Control Limit (LCL)
+
+Out-of-control points (outside UCL/LCL) indicate special cause variation.
+:::
+
+::: {.column width="50%"}
+<iframe data-src='media/plots/control_chart_machine1.html' width='100%' height='500px' style='border:none;'></iframe>
+:::
+
+::::
